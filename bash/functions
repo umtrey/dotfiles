@@ -1,0 +1,276 @@
+# Create a new directory and enter it
+function mkd() {
+  mkdir -p "$@" && cd "$@"
+}
+
+# cnuapp specific
+# gets cluster name, or sets it if defined
+function cl() {
+  if [ -z "$1" ]; then
+    echo "`readlink /etc/cnu/cnu_env | sed 's;.*\.\(.*\);\1;'`"
+    return
+  fi
+
+  if [ ! -e "/etc/cnu/cnu_env.$1" ]; then
+    echo "/etc/cnu/cnu_env.$1 not found" >&2
+    return
+  fi
+
+  rm -f /etc/cnu/cnu_env
+  ln -s "/etc/cnu/cnu_env.$1" /etc/cnu/cnu_env
+}
+
+# cnuapp service functions
+function cnuservice () {
+  if [ -z "$1" ]; then
+    action="restart"
+  else
+    action="$1"
+  fi
+
+  case "$action" in
+    lsws)
+      sudo sv restart /var/service/lsws
+    ;;
+    stop)
+      sudo sv d /var/service/*
+      sudo /etc/init.d/redis-server stop
+      db stop
+    ;;
+    start)
+      db start
+      sudo sv u /var/service/*
+      sudo /etc/init.d/redis-server start
+    ;;
+    restart)
+      cnuservice stop
+      cnuservice start
+    ;;
+  esac
+}
+
+# cnuapp db functions
+function db () {
+  cluster=${2:-`cl`}
+  echo Cluster=$cluster
+
+  suffix=`echo $cluster | tr '[A-Z]' '[a-z]'`
+  PGCMDSUFF=''
+
+  ver=8.4
+  export PGCLUSTER=8.4/main
+  export PGPORT=5432
+
+  if [ "$suffix" = "us" ]; then
+    local_db=cnuapp_dev
+  else
+    local_db=`echo cnuapp_dev_$suffix | sed 's/_$//'`
+  fi
+
+  case "$1" in
+    local)
+      psql -U postgres $local_db
+    ;;
+    stop)
+      sudo /etc/init.d/postgresql$PGCMDSUFF stop
+    ;;
+    start)
+      sudo /etc/init.d/postgresql$PGCMDSUFF start
+    ;;
+    restart)
+      sudo /etc/init.d/postgresql$PGCMDSUFF restart
+    ;;
+    rebuild)
+      pushd /export/cnuapp/cnuapp >/dev/null 2>&1
+      cmd="sudo bin/cnurake db:rebuild name=${local_db} cluster=${cluster} ver=${ver} verbose=1 force=true"
+      echo $cmd
+      sudo bin/cnurake db:rebuild name=$local_db cluster=$cluster ver=$ver verbose=1 force=true
+      popd >/dev/null 2>&1
+    ;;
+    slave)
+      slave_pgport=5432
+      case "$cluster" in
+        US)
+          slave_host=slavedb.cashnetusa.com
+        ;;
+        GB)
+          slave_host=slavedb.quickquid.co.uk
+        ;;
+        JV)
+          slave_host=slavedbjv.cashnetusa.com
+        ;;
+        AU)
+          slave_host=slavedb.dollarsdirect.com.au
+        ;;
+        CA)
+          slave_host=slavedb.dollarsdirect.ca
+        ;;
+      esac
+      slave_db=`echo cnuapp_prod_$suffix | sed -e 's/gb/uk/' -e 's/_$//'`
+
+      cmd="psql -U dspringer -h $slave_host -p $slave_pgport $slave_db"
+      echo $cmd
+      ${(z)cmd}
+    ;;
+    query)
+      slave_pgport=5432
+      query=$3
+      outputpath=${4:-"output.csv"}
+      case "$cluster" in
+        US)
+          slave_host=slavedb.cashnetusa.com
+        ;;
+        GB)
+          slave_host=slavedb.quickquid.co.uk
+        ;;
+        JV)
+          slave_host=slavedbjv.cashnetusa.com
+        ;;
+        AU)
+          slave_host=slavedb.dollarsdirect.com.au
+        ;;
+        CA)
+          slave_host=slavedb.dollarsdirect.ca
+        ;;
+      esac
+      slave_db=`echo cnuapp_prod_$suffix | sed -e 's/gb/uk/' -e 's/_$//'`
+      cmd="psql -U dspringer -h $slave_host -p $slave_pgport -d $slave_db -t -A -F',' -c '$query' > $output_path"
+      echo $cmd
+      ${(z)cmd}
+    ;;
+    dump)
+      mkdir -p ~/db
+
+      pg_dump -U postgres ${local_db} | gzip > ~/db/${local_db}.gz
+    ;;
+    restore)
+      dropdb -U postgres ${local_db} && createdb -U postgres ${local_db} && gunzip -c ~/db/${local_db}.gz | psql -U postgres ${local_db} >&-
+    ;;
+  esac
+}
+
+# cnu-specific smart rspec
+function cnurspec () {
+  # can have 0 or 1 or 2 parameters
+  # no parameters - run new suite
+  # only parameter is old or new, runs specified suite
+  # only parameter is a filename or a path, run the specified suite SMARTLY
+  # if two parameters given, run first argument suite with second arg file
+  if [[ -z "$1" ]] || [[ "$1" = "new" ]]; then
+    cnurspecnew $2
+  elif [[ "$1" = "old" ]]; then
+    cnurspecold $2
+  elif exists $1; then
+    fpath=`readlink -f $1`
+    if [[ "$fpath" =~ .*spec\/.* ]]; then
+      cnurspecnew $fpath
+    else
+      cnurspecold $fpath
+    fi
+  else
+    echo "unknown parameters, running new suite"
+    cnurspecnew
+  fi
+}
+
+function cnurspecnew () {
+  # runs new suite
+  pushd /export/cnuapp/suite >/dev/null 2>&1
+
+  # need to identify if file, task number is passed in
+  if [[ "$1" =~ ^[0-9]+$ ]] ; then
+    cmd="../cnuapp/bin/cnu_env rspec -t tc:$1 spec"
+  elif exists $1 ; then
+    cmd="../cnuapp/bin/cnu_env rspec $1"
+  else
+    cmd="../cnuapp/bin/cnu_env rspec spec"
+  fi
+
+  echo ${cmd}
+  ${(z)cmd}
+
+  popd >/dev/null 2>&1
+}
+
+function cnurspecold () {
+  pushd /export/cnuapp/cnuapp/test >/dev/null 2>&1
+  
+  if [[ -z "$1" ]]; then
+    cmd="../bin/cnurake test"
+  elif exists $1 ; then
+    cmd="../bin/cnurake test test=$1"
+  else
+    cmd="../bin cnurake test"
+  fi
+
+  echo ${cmd}
+  ${(z)cmd}
+
+  popd >/dev/null 2>&1
+}
+
+exists() {
+  [[ -e "$1" ]] || [[ -d "$1" ]]
+}
+
+# Determine size of a file or total size of a directory
+function fs() {
+  if du -b /dev/null > /dev/null 2>&1; then
+    local arg=-sbh
+  else
+    local arg=-sh
+  fi
+  if [[ -n "$@" ]]; then
+    du $arg -- "$@"
+  else
+    du $arg .[^.]* *
+  fi
+}
+
+# Use Git’s colored diff when available
+hash git &>/dev/null
+if [ $? -eq 0 ]; then
+  function diff() {
+    git diff --no-index --color-words "$@"
+  }
+fi
+
+# Add note to Notes.app (OS X 10.8)
+# Usage: `note 'foo'` or `echo 'foo' | note`
+function note() {
+  local text
+  if [ -t 0 ]; then # argument
+    text="$1"
+  else # pipe
+    text=$(cat)
+  fi
+  body=$(echo "$text" | sed -E 's|$|<br>|g')
+  osascript >/dev/null <<EOF
+tell application "Notes"
+  tell account "iCloud"
+    tell folder "Notes"
+      make new note with properties {name:"$text", body:"$body"}
+    end tell
+  end tell
+end tell
+EOF
+}
+
+# Add reminder to Reminders.app (OS X 10.8)
+# Usage: `remind 'foo'` or `echo 'foo' | remind`
+function remind() {
+  local text
+  if [ -t 0 ]; then
+    text="$1" # argument
+  else
+    text=$(cat) # pipe
+  fi
+  osascript >/dev/null <<EOF
+tell application "Reminders"
+  tell the default list
+    make new reminder with properties {name:"$text"}
+  end tell
+end tell
+EOF
+}
+

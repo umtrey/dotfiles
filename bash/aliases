@@ -1,0 +1,65 @@
+unamestr=`uname`
+if [[ "$unamestr" == 'Linux' ]]; then
+  # cnu paths
+  export PATH=/cnu/bin:/export/web/stable/cnuapp/bin:/export/web/cnuapp/lib/service_mgr/bin:${HOME}/cnu-tools/bin:/export/web/stable/cabar/bin:/etc/postgresql/8.4/main:/etc/postgresql/8.3/main:${PATH}
+
+  # cnu shortcuts
+  alias ew='cd /export/web'
+
+  alias fullreloadcnu='db rebuild; blipcnu'
+  alias reloadcnu='cnuservice lsws; htop'
+  alias blipcnu='sudo sv d /var/service/lsws; sudo /etc/init.d/memcached restart; sleep 3; sudo sv u /var/service/lsws; htop'
+  alias cnuconsole='/export/web/cnuapp/script/console'
+  alias zanddb='psql -h zanddb.cashnetusa.com -p 5432 -U dspringer uksms_production'
+
+  # logs
+  alias flog='tail -f /var/log/cnuapp/frontend.log'
+  alias plog='tail -f /var/log/cnuapp/portal.log'
+  alias logs='tail -f /var/log/cnuapp/*.log'
+  alias elog='tail -f /var/log/cnuapp/stderr.log'
+  alias slog='tail -f /export/web/cnuapp/web/cnuapp/var/service_mgr*/*.log'
+
+  # misc
+  alias findtrey='tail -f loc.log | grep "TREY"'
+  alias ntp='sudo ntpdate-debian'
+else
+  alias mountcnuapp='sshfs cnuapp@192.168.56.78:/export/cnuapp ~/Developer/cnuapp'
+  alias umountcnuapp='umount ~/Developer/cnuapp'
+  alias startpostgres='postgres -D /usr/local/var/postgres'
+fi
+
+
+function cs () {
+        cd "$@" && ls
+				}
+
+function u() { NUM=#{1:-1}; for (( start = 1; start <= $NUM; start++ )); do cd..; done; }
+alias h='cd ~'
+alias home='cd ~'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias ......='cd ../../../../..'
+alias .......='cd ../../../../../..'
+alias ........='cd ../../../../../../..'
+alias .........='cd ../../../../../../../..'
+
+# aliases
+alias pgstart='pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start'
+alias pgstop='pg_ctl -D /usr/local/var/postgres stop -s -m fast'
+alias pgstatus='ps auxwww | grep postgres'
+alias sshxen='ssh -x cnuapp@trey.dev.cashnetusa.com'
+alias get='git'
+alias l='ls -alh'
+alias sshtestdev='ssh -x cnuapp@192.168.56.78'
+alias sshtestdevhead='ssh -Y cnuapp@192.168.56.78'
+alias miniraiserup='MINIRAISER_ENV=development vagrant up'
+alias df='df -h'
+alias reload="source ~/.zshrc"
+alias be="bundle exec"
+alias ber="bundle exec rake"
+alias beer="ber"
+alias rb="rbenv"
+alias pow="powify"
+alias rdb="rake db:create db:migrate db:seed"
