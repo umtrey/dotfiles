@@ -46,8 +46,9 @@ set sidescroll=10               " 3 line buffer horizontally as well
 set wildmenu                    " make tab completion for files/buffers act like bash
 set wildmode=list:full          " show a list when pressing tab and complete first full match
 set pastetoggle=<F2>            " toggle paste indentation w/ F2
-set clipboard+=unnamed          " share clipboard
-set clipboard=unnamed
+if $TMUX == ''
+  set clipboard+=unnamed          " share clipboard
+endif
 set more                        " page on extended output
 set ttyfast                     " smoother redraws
 set lazyredraw                  " do not redraw while executing macros
