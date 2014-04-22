@@ -4,6 +4,7 @@ export LSCOLORS=exfxcxdxbxegedabagacad
 export LS_COLORS="di=1;0;34:ln=0;35:so=32:pi=0;33:ex=0;31:bd=37;46:cd=37;43:su=37;41:sg=37;46:tw=37;42:ow=37;43:or=37;45:mi=37;43:"
 export LESS="-erX"
 export EDITOR="vim"
+export JAVA_HOME=$(/usr/libexec/java_home)
 
 if echo hello | grep --color=auto l >/dev/null 2>&1; then
   export GREP_OPTIONS='--color=auto'
@@ -16,4 +17,5 @@ export HISTIGNORE="&:ls:[bf]g:exit:history"
 export HISTCONTROL=ignoreboth
 export HISTSIZE=100000
 
+export PATH="/usr/local/bin:$PATH"
 export PATH="$HOME/.rbenv/bin:$PATH"
