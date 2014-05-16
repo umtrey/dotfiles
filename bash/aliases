@@ -1,34 +1,3 @@
-unamestr=`uname`
-if [[ "$unamestr" == 'Linux' ]]; then
-  # cnu paths
-  export PATH=/cnu/bin:/export/web/stable/cnuapp/bin:/export/web/cnuapp/lib/service_mgr/bin:${HOME}/cnu-tools/bin:/export/web/stable/cabar/bin:/etc/postgresql/8.4/main:/etc/postgresql/8.3/main:${PATH}
-
-  # cnu shortcuts
-  alias ew='cd /export/web'
-
-  alias fullreloadcnu='db rebuild; blipcnu'
-  alias reloadcnu='cnuservice lsws; htop'
-  alias blipcnu='sudo sv d /var/service/lsws; sudo /etc/init.d/memcached restart; sleep 3; sudo sv u /var/service/lsws; htop'
-  alias cnuconsole='/export/web/cnuapp/script/console'
-  alias zanddb='psql -h zanddb.cashnetusa.com -p 5432 -U dspringer uksms_production'
-
-  # logs
-  alias flog='tail -f /var/log/cnuapp/frontend.log'
-  alias plog='tail -f /var/log/cnuapp/portal.log'
-  alias logs='tail -f /var/log/cnuapp/*.log'
-  alias elog='tail -f /var/log/cnuapp/stderr.log'
-  alias slog='tail -f /export/web/cnuapp/web/cnuapp/var/service_mgr*/*.log'
-
-  # misc
-  alias findtrey='tail -f loc.log | grep "TREY"'
-  alias ntp='sudo ntpdate-debian'
-else
-  alias mountcnuapp='sshfs cnuapp@192.168.56.78:/export/cnuapp ~/Developer/cnuapp'
-  alias umountcnuapp='umount ~/Developer/cnuapp'
-  alias startpostgres='postgres -D /usr/local/var/postgres'
-fi
-
-
 function cs () {
         cd "$@" && ls
 				}
@@ -64,3 +33,4 @@ alias rb="rbenv"
 alias pow="powify"
 alias rdb="rake db:create db:migrate db:seed"
 alias clearlogs="rm log/*.log; touch log/development.log; touch log/test.log"
+alias frb="git fetch; git rebase origin master"
