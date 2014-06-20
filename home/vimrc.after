@@ -68,6 +68,8 @@ set wildignore+=*.jpg,*.bmp,*.gif,*.png,*.jpeg
 set wildignore+=*.JPG,*.BMP,*.GIF,*.PNG,*.JPEG
 set wildignore+=*.mp3,*.doc,*.docx,*.xls,*.xlsx,*.pdf,*.wav
 set wildignore+=*.MP3,*.DOC,*.DOCX,*.XLS,*.XLSX,*.PDF,*.WAV
+set wildignore+=*.flv,*.swf,*.eot,*.ttf
+set wildignore+=*.FLV,*.SWF,*.EOT,*.TTF
 let g:ctrlp_custom_ignore = {
   \ 'dir':  '\.git$\|\.hg$\|\.svn$',
   \}

@@ -28,3 +28,6 @@ include ~/dotfiles/hosts/$(ls ~/dotfiles/hosts | grep $(hostname -s))
 for file in ~/dotfiles/bash/*; do
   . "$file"
 done
+
+source '/usr/local/share/chruby/chruby.sh'
+source '/usr/local/share/chruby/auto.sh'

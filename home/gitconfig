@@ -24,3 +24,8 @@
   autosquash = true
 [web]
   browser = open
+[user]
+	name = Trey Springer
+	email = dfsiii@gmail.com
+[credential]
+	helper = osxkeychain
