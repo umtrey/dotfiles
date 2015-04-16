@@ -29,5 +29,8 @@ for file in ~/dotfiles/bash/*; do
   . "$file"
 done
 
-source '/usr/local/share/chruby/chruby.sh'
-source '/usr/local/share/chruby/auto.sh'
+# now we're using rvm, so sad
+#source '/usr/local/share/chruby/chruby.sh'
+#source '/usr/local/share/chruby/auto.sh'
+
+export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting

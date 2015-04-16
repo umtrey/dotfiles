@@ -17,5 +17,13 @@ export HISTIGNORE="&:ls:[bf]g:exit:history"
 export HISTCONTROL=ignoreboth
 export HISTSIZE=100000
 
+export GOPATH="$HOME/Developer/go"
+export CDPATH=.:$GOPATH/src/code.google.com/p:$GOPATH/src/github.com
+
+export DOCKER_HOST=tcp://192.168.59.103:2376
+export DOCKER_CERT_PATH=/Users/tspringer/.boot2docker/certs/boot2docker-vm
+export DOCKER_TLS_VERIFY=1
+
 export PATH="/usr/local/bin:$PATH"
+export PATH="/usr/local/sbin:$PATH"
 export PATH="$HOME/.rbenv/bin:$PATH"
