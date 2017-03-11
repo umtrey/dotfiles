@@ -29,8 +29,5 @@ for file in ~/dotfiles/bash/*; do
   . "$file"
 done
 
-# now we're using rvm, so sad
-#source '/usr/local/share/chruby/chruby.sh'
-#source '/usr/local/share/chruby/auto.sh'
-
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+export RBENV_ROOT=/usr/local/var/rbenv
+if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
