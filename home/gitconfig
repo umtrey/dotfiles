@@ -26,6 +26,6 @@
   browser = open
 [user]
 	name = Trey Springer
-	email = dfsiii@gmail.com
+	email = trey.springer@gamut.com
 [credential]
 	helper = osxkeychain
