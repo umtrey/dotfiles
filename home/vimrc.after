@@ -64,8 +64,8 @@ set statusline+=[%p%%]
 let g:ctrlp_map = '<c-p>'
 
 let g:ctrlp_working_path_mode = 2
-set wildignore+=*.jpg,*.bmp,*.gif,*.png,*.jpeg
-set wildignore+=*.JPG,*.BMP,*.GIF,*.PNG,*.JPEG
+set wildignore+=*.jpg,*.bmp,*.gif,*.png,*.jpeg,*.pdf
+set wildignore+=*.JPG,*.BMP,*.GIF,*.PNG,*.JPEG,*.PDF
 set wildignore+=*.mp3,*.doc,*.docx,*.xls,*.xlsx,*.pdf,*.wav
 set wildignore+=*.MP3,*.DOC,*.DOCX,*.XLS,*.XLSX,*.PDF,*.WAV
 set wildignore+=*.flv,*.swf,*.eot,*.ttf

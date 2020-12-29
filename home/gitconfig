@@ -5,6 +5,7 @@
   lc = log @{1}.. --stat --no-merges
   lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%ar)%Creset' --abbrev-commit --date=relative
   ff = merge --ff-only @{u}
+  newbranch = checkout -b
 [color]
   diff = auto
   status = auto
@@ -25,7 +26,7 @@
 [web]
   browser = open
 [user]
-	name = Trey Springer
-	email = trey.springer@gamut.com
+  name = Trey Springer
+  email = trey@brilliantmade.com
 [credential]
-	helper = osxkeychain
+  helper = osxkeychain

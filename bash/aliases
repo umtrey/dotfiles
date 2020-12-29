@@ -18,12 +18,8 @@ alias .........='cd ../../../../../../../..'
 alias pgstart='pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start'
 alias pgstop='pg_ctl -D /usr/local/var/postgres stop -s -m fast'
 alias pgstatus='ps auxwww | grep postgres'
-alias sshxen='ssh -x cnuapp@trey.dev.cashnetusa.com'
 alias get='git'
 alias l='ls -alh'
-alias sshtestdev='ssh -x cnuapp@192.168.56.78'
-alias sshtestdevhead='ssh -Y cnuapp@192.168.56.78'
-alias miniraiserup='MINIRAISER_ENV=development vagrant up'
 alias df='df -h'
 alias reload="source ~/.zshrc"
 alias be="bundle exec"
